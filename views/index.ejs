@@ -1,12 +1,8 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <title>DS-Search</title>
-    <link type="text/css" rel="stylesheet" href="stylesheets/style.css">
+    <%- include('./partials/head.ejs') %>
     <link type="text/css" rel="stylesheet" href="stylesheets/index.css">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <meta name="description" content="DS-Search is a tool to search for data stored on a Synology NAS">
 </head>
 <body>
 <div class="container">
@@ -40,11 +36,7 @@
     <img src="images/loading.gif" alt="Loading" id="loadingGif">
 </div>
 
-<div id="cookie-banner">
-    <p>This website uses cookies to store the users session id with the NAS. No user data is collected.</p>
-    <button onclick="acceptCookies()">Got it!</button>
-</div>
+<%- include('./partials/cookies.ejs') %>
 <script src="javascripts/index.js"></script>
-<script src="javascripts/cookie.js"></script>
 </body>
 </html>

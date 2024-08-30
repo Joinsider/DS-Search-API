@@ -10,7 +10,7 @@ let fetch;
     fetch = (await import('node-fetch')).default;
 })();
 
-async function loginToAPI(protocol, url, username, password, otp_code) {
+async function loginSynAPI(protocol, url, username, password, otp_code) {
     if (!protocol || !url || !username || !password) {
         return false;
     }
@@ -32,22 +32,7 @@ async function loginToAPI(protocol, url, username, password, otp_code) {
     }
 
     try {
-        const response = await fetch(location, { agent });
-
-        if (!response.ok) {
-            throw new Error(`HTTP error! status: ${response.status}`);
-        }
-
-        console.log("Response status:", response.status);
-        console.log("Response headers:", response.headers);
-
-        const data = await response.json();
-        console.log("Response JSON:", data);
-
-        if (!data.success || data.error) {
-            console.error("API error:", data.error);
-            return false;
-        }
+        const data = await makeRequest(location);
 
         if (data.data && data.data.sid) {
             const sid = data.data.sid;
@@ -79,7 +64,58 @@ async function getSharedFolders(protocol, url, sid) {
     )
 }
 
+async function logoutSynAPI(protocol, url, sid) {
+    if (!sid) {
+        return false;
+    }
+
+    const location = `${protocol}${url}/webapi/auth.cgi?api=SYNO.API.Auth&version=3&method=logout&session=FileStation&_sid=${sid}`;
+
+    if (!validUrl.isUri(location)) {
+        console.log("Invalid URL");
+        return false;
+    }
+
+    try {
+        const data = await makeRequest(location);
+
+        if(data.success) {
+            console.log("Logout successful");
+            return true;
+        }
+        throw new Error("Logout failed");
+    } catch (error) {
+        console.error("Error:", error);
+        if (error instanceof TypeError && error.message === 'fetch failed') {
+            console.error("Network error:", error.cause);
+        }
+        return false;
+    }
+}
+
+
+async function makeRequest(location) {
+    const response = await fetch(location, { agent });
+
+    if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+    }
+
+    console.log("Response status:", response.status);
+    console.log("Response headers:", response.headers);
+
+    const data = await response.json();
+    console.log("Response JSON:", data);
+
+    if (!data.success || data.error) {
+        console.error("API error:", data.error);
+        return false;
+    }
+    return data;
+}
+
 module.exports = {
-    loginToAPI,
+    loginSynAPI,
+    logoutSynAPI,
     getSharedFolders
 }

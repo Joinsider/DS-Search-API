@@ -3,7 +3,9 @@ const router = express.Router();
 
 const api = require('../controller/synapi');
 
-/* API */
+require('dotenv').config();
+
+const secureCookies = process.env.SECURE_COOKIES || false;
 
 router.get('/', function(req, res, next) {
     res.send('API is working properly');
@@ -24,7 +26,7 @@ router.post('/login', async function (req, res) {
     }
 
     try {
-        const api_res = await api.loginToAPI(protocol, url, username, password, otp_code);
+        const api_res = await api.loginSynAPI(protocol, url, username, password, otp_code);
         console.log("API response:", api_res);
 
         if(api_res === false) {
@@ -35,9 +37,19 @@ router.post('/login', async function (req, res) {
             // Set the cookie
             res.cookie('synology_sid', api_res.data.sid, {
                 httpOnly: true, // Makes the cookie inaccessible to client-side JavaScript
-                secure: true, // Ensures the cookie is only sent over HTTPS
+                secure: secureCookies, // Ensures the cookie is only sent over HTTPS
                 maxAge: 7 * 24 * 60 * 60 * 1000, // 7 days in milliseconds
                 sameSite: 'strict' // Protects against CSRF attacks
+            }).cookie('protocol', protocol, {
+                httpOnly: false,
+                secure: secureCookies,
+                maxAge: 7 * 24 * 60 * 60 * 1000,
+                sameSite: 'strict'
+            }).cookie('url', url, {
+                httpOnly: false,
+                secure: secureCookies,
+                maxAge: 7 * 24 * 60 * 60 * 1000,
+                sameSite: 'strict'
             });
 
             // Return the response
@@ -54,5 +66,29 @@ router.post('/login', async function (req, res) {
         res.status(500).send('Error: ' + error);
     }
 })
+
+router.get('/logout', async function (req, res) {
+   // Get the cookie
+    const sid = req.cookies.synology_sid;
+    const protocol = req.cookies.protocol;
+    const url = req.cookies.url;
+    if(!sid) {
+        return res.status(400).send('No SID found');
+    }
+
+    try {
+        const api_res = await api.logoutSynAPI(protocol, url, sid);
+        if (!api_res) {
+            return res.status(500).send('Logout failed');
+        }else {
+            // Delete the three cookies
+            res.clearCookie('synology_sid').clearCookie('protocol').clearCookie('url').send('Logout successful');
+        }
+    }catch (error) {
+        console.error("Error:", error);
+        return res.status(500).send('Error: ' + error);
+    }
+
+});
 
 module.exports = router;

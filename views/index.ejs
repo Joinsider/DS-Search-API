@@ -1,53 +1,50 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>DSSearch API Server</title>
-  <style>
-    body {
-      font-family: Arial, sans-serif;
-      background-color: #f0f0f0;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      height: 100vh;
-      margin: 0;
-    }
-    .container {
-      background-color: #ffffff;
-      border-radius: 8px;
-      padding: 40px;
-      box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-      text-align: center;
-    }
-    h1 {
-      color: #333333;
-      margin-bottom: 20px;
-    }
-    p {
-      color: #666666;
-      margin-bottom: 30px;
-    }
-    a {
-      display: inline-block;
-      background-color: #007bff;
-      color: #ffffff;
-      text-decoration: none;
-      padding: 10px 20px;
-      border-radius: 4px;
-      transition: background-color 0.3s ease;
-    }
-    a:hover {
-      background-color: #0056b3;
-    }
-  </style>
+    <meta charset="UTF-8">
+    <title>DS-Search</title>
+    <link type="text/css" rel="stylesheet" href="stylesheets/style.css">
+    <link type="text/css" rel="stylesheet" href="stylesheets/index.css">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="description" content="DS-Search is a tool to search for data stored on a Synology NAS">
 </head>
 <body>
 <div class="container">
-  <h1>DSSearch API Server</h1>
-  <p>This is the API server for the DSSearch application. For more information, please visit the GitHub project page.</p>
-  <a href="https://github.com/Joinsider/DSSearch/" target="_blank">Visit DSSearch on GitHub</a>
+    <h1>DS Search</h1>
+    <form class="connection-form">
+        <label for="url">URL:</label>
+        <div class="url-input-container">
+            <select class="protocol-selector" id="protocolSelector">
+                <option value="http://">http://</option>
+                <option value="https://" selected>https://</option>
+            </select>
+            <input type="text" class="url-input" placeholder="Enter URL" id="url" name="url">
+        </div>
+
+        <label for="username">Username:</label>
+        <input type="text" id="username" name="username" autocomplete="username">
+
+        <label for="password">Password:</label>
+        <input type="password" id="password" name="password" autocomplete="current-password">
+
+        <label for="otp_code">OTP Code:</label>
+        <input type="text" id="otp_code" name="otp_code">
+
+        <!-- Add a switch to enable/disable checktls -->
+        <div class="center">
+            <input type="submit" value="Connect">
+        </div>
+    </form>
 </div>
+<div class="loadingContainer" active="false">
+    <img src="images/loading.gif" alt="Loading" id="loadingGif">
+</div>
+
+<div id="cookie-banner">
+    <p>This website uses cookies to store the users session id with the NAS. No user data is collected.</p>
+    <button onclick="acceptCookies()">Got it!</button>
+</div>
+<script src="javascripts/index.js"></script>
+<script src="javascripts/cookie.js"></script>
 </body>
 </html>

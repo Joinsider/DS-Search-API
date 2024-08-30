@@ -14,3 +14,5 @@ npm install
 ```bash
 nodemon bin/www
 ```
+
+## API functions:

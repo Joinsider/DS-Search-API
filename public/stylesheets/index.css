@@ -1,0 +1,39 @@
+.url-input-container {
+    display: flex;
+    width: 100%;
+    background-color: var(--color-surface-200);
+    border-radius: 10px;
+    overflow: hidden;
+}
+
+.protocol-selector {
+    padding: 10px;
+    font-size: 16px;
+    border-radius: 0;
+    border: none;
+    color: var(--color-surface-500);
+    cursor: pointer;
+    margin: 0;
+}
+
+.url-input {
+    flex-grow: 1;
+    padding: 10px;
+    border: none;
+    outline: none;
+    margin: 0;
+}
+
+label {
+    font-weight: bold;
+    display: block;
+    padding-top: 15px;
+    padding-bottom: 0;
+}
+
+form {
+    display: grid;
+    grid-template-columns: 1fr;
+    max-width: 1500px;
+    width: 80%;
+}

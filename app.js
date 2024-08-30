@@ -22,6 +22,9 @@ app.use(express.static(path.join(__dirname, 'public')));
 app.use('/', indexRouter);
 app.use('/api', apiRouter);
 
+const timeout = require('connect-timeout');
+app.use(timeout('30s'));
+
 app.use(function(req, res, next) {
   console.log("server up");
     next();

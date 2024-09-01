@@ -42,26 +42,9 @@ async function loginSynAPI(protocol, url, username, password, otp_code) {
 
         return false;
     } catch (error) {
-        console.error("Error:", error);
-        if (error instanceof TypeError && error.message === 'fetch failed') {
-            console.error("Network error:", error.cause);
-        }
+        error(error);
         return false;
     }
-}
-async function getSharedFolders(protocol, url, sid) {
-    if (!protocol || !url || !sid) {
-        return
-    } else if (url.endsWith('/')) {
-        url = url.slice(0, -1);
-    }
-    let location = protocol + url + '/webapi/entry.cgi?api=SYNO.FileStation.List&version=2&sort_by=name&method=list_share&sid=' + sid;
-
-    const response = await fetch(location, {
-            method: 'GET',
-            mode: 'no-cors',
-        }
-    )
 }
 
 async function logoutSynAPI(protocol, url, sid) {
@@ -85,10 +68,32 @@ async function logoutSynAPI(protocol, url, sid) {
         }
         throw new Error("Logout failed");
     } catch (error) {
-        console.error("Error:", error);
-        if (error instanceof TypeError && error.message === 'fetch failed') {
-            console.error("Network error:", error.cause);
+        error(error);
+        return false;
+    }
+}
+
+async function getSharedFolders(protocol, url, sid) {
+    if(!sid || !protocol || !url) {
+        return false;
+    }
+
+    const encodedUrl = encodeURIComponent(url);
+    const encodedSid = encodeURIComponent(sid);
+
+    const location = `${protocol}${encodedUrl}/webapi/entry.cgi?api=SYNO.FileStation.List&version=2&sort_by=name&method=list_share&sid=${encodedSid}`;
+    console.log("API location Shared Folders:", location);
+    try {
+        const data = await makeRequest(location);
+        console.log("Raw Response Data: " + data);
+        if(data.success === false) {
+            throw new Error("API error");
+        } else if(data.data.total === 0 || data.data.shares.length === 0) {
+            throw new Error("No shared folders found");
         }
+        return data.data.shares;
+    } catch (error) {
+        console.log("Error:", error);
         return false;
     }
 }
@@ -108,10 +113,18 @@ async function makeRequest(location) {
     console.log("Response JSON:", data);
 
     if (!data.success || data.error) {
-        console.error("API error:", data.error);
+        err(data.error);
         return false;
     }
     return data;
+}
+
+function err(error) {
+    console.error("Error:", error);
+    if (error instanceof TypeError && error.message === 'fetch failed') {
+        console.error("Network error:", error.cause);
+    }
+    return false;
 }
 
 module.exports = {

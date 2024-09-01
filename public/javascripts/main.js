@@ -18,6 +18,8 @@ async function logout() {
         }
         // The cookie is deleted
         document.cookie = 'synology_sid=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;';
+        document.cookie = 'protocol=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;';
+        document.cookie = 'url=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;';
         alert('Logout successful');
         window.location.href = '/';
     } catch (error) {

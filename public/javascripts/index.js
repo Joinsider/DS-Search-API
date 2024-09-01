@@ -44,8 +44,7 @@ connectionForm.addEventListener('submit', async (event) => {
         if(response.statusCode === 500) {
             throw new Error('Connection failed');
         }
-        const data = await response.json();
-        alert('Connection successful: SID: ' + data.sid);
+        window.location.href = '/sharedFolders';
 
     } catch (error) {
         console.error("Error:", error);

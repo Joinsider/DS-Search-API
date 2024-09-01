@@ -11,6 +11,8 @@ router.get('/', function(req, res, next) {
     res.send('API is working properly');
 });
 
+
+// Auth
 router.post('/login', async function (req, res) {
 
     const protocol = req.body.protocol;
@@ -90,5 +92,30 @@ router.get('/logout', async function (req, res) {
     }
 
 });
+
+// Folders
+router.get('/sharedFolders', (req, res) => {
+    const sid = req.cookies.synology_sid;
+    const protocol = req.cookies.protocol;
+    const url = req.cookies.url;
+    console.log("Cookies:", sid, protocol, url);
+
+    if (!sid) {
+        return res.status(400).send('No SID found');
+    }
+
+    try {
+        const api_res = api.getSharedFolders(protocol, url, sid);
+        if (!api_res) {
+            return res.status(500).send('Error: No shared folders found');
+        } else if (api_res === false) {
+            return res.status(500).send('Error: API error');
+        }
+        return res.json(api_res);
+    } catch (error) {
+        console.error("Error:", error);
+        return res.status(500).send('Error: ' + error);
+    }
+})
 
 module.exports = router;

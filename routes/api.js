@@ -84,7 +84,7 @@ router.get('/logout', async function (req, res) {
             return res.status(500).send('Logout failed');
         }else {
             // Delete the three cookies
-            res.clearCookie('synology_sid').clearCookie('protocol').clearCookie('url').send('Logout successful');
+            res.clearCookie('synology_sid');
         }
     }catch (error) {
         console.error("Error:", error);
@@ -94,7 +94,7 @@ router.get('/logout', async function (req, res) {
 });
 
 // Folders
-router.get('/sharedFolders', (req, res) => {
+router.get('/sharedFolders', async (req, res) => {
     const sid = req.cookies.synology_sid;
     const protocol = req.cookies.protocol;
     const url = req.cookies.url;
@@ -105,7 +105,7 @@ router.get('/sharedFolders', (req, res) => {
     }
 
     try {
-        const api_res = api.getSharedFolders(protocol, url, sid);
+        const api_res = await api.getSharedFolders(protocol, url, sid);
         if (!api_res) {
             return res.status(500).send('Error: No shared folders found');
         } else if (api_res === false) {

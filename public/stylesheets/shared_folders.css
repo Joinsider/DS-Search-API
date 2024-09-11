@@ -1,0 +1,29 @@
+div .shared_folders {
+  margin-top: 20px;
+  margin-bottom: 20px;
+}
+
+div .folder {
+    background-color: var(--color-surface-200);
+    border-radius: 5px;
+    padding: 10px;
+    margin-bottom: 10px;
+    cursor: pointer;
+    font-weight: bold;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    grid-gap: 10px;
+    width: 80%;
+}
+
+div .folder:hover {
+    background-color: var(--color-surface-300);
+}
+
+div .folder h3 {
+    color: var(--color-primary-500);
+}
+
+div .folder[selected="true"] {
+    background-color: var(--color-surface-400);
+}

@@ -5,7 +5,7 @@ document.addEventListener('DOMContentLoaded', async function () {
 
     setCookie('selectedFolder', '', 0);
 
-    const res = await fetchFolders();
+    const res = await fetchFolders('/api/sharedFolders');
     loading.setAttribute('active', 'false');
     if (res === false) {
         const noFolders = document.createElement('div');
@@ -17,26 +17,6 @@ document.addEventListener('DOMContentLoaded', async function () {
     console.log("now implement folders");
     implementFolders(res);
 });
-
-
-function implementFolders(folders) {
-    const sharedFolders = document.querySelector('.shared_folders');
-    console.log(folders);
-    folders.forEach(folder => {
-        const folderDiv = document.createElement('div');
-        if(folder.isdir === true) {
-            folderDiv.classList.add('folder');
-            folderDiv.setAttribute('onclick', "selectFolder('" + folder.path + "')");
-        }else {
-            folderDiv.classList.add('file');
-        }
-        folderDiv.innerHTML = `
-            <h3>${folder.name}</h3>
-            <p>Path: ${folder.path}</p>`;
-        sharedFolders.appendChild(folderDiv);
-        console.log(folder);
-    });
-}
 
 async function fetchFolders() {
     let folders;

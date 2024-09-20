@@ -14,6 +14,7 @@ div .folder {
     grid-template-columns: 1fr 1fr;
     grid-gap: 10px;
     width: 80%;
+    align-content: center;
 }
 
 div .folder:hover {
@@ -26,4 +27,16 @@ div .folder h3 {
 
 div .folder[selected="true"] {
     background-color: var(--color-surface-400);
+}
+
+.folder_icon, .file_icon {
+    height: 50%;
+}
+
+
+/* Small Screens Grid underneath */
+@media (max-width: 768px) {
+    div .folder {
+        grid-template-columns: 1fr;
+    }
 }

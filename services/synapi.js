@@ -101,6 +101,7 @@ async function getSharedFolders(protocol, url, sid) {
 }
 
 
+
 async function makeRequest(location) {
     const response = await fetch(location, { agent });
 

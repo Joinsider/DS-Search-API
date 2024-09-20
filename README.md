@@ -12,7 +12,9 @@ npm install
 
 ### Usage:
 ```bash
-nodemon bin/www
+npm start
 ```
 
-## API functions:
+## More Information:
+- [Backend Documentation](documentation/backend.md)
+- [Frontend Documentation](documentation/frontend.md)

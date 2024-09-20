@@ -1,7 +1,7 @@
 const express = require('express');
 const router = express.Router();
 
-const api = require('../controller/synapi');
+const api = require('../services/synapi');
 
 require('dotenv').config();
 
@@ -117,5 +117,30 @@ router.get('/sharedFolders', async (req, res) => {
         return res.status(500).send('Error: ' + error);
     }
 })
+
+router.get('/listFolder', async (req, res) => {
+    const sid = req.cookies.synology_sid;
+    const protocol = req.cookies.protocol;
+    const url = req.cookies.url;
+    const path = req.query.folder;
+
+    if (!sid) {
+        return res.status(400).send('No SID found');
+    }
+
+    try {
+        const api_res = await api.listFolder(protocol, url, sid, path);
+        if (!api_res) {
+            return res.status(500).send('Error: No files found');
+        } else if (api_res === false) {
+            return res.status(500).send('Error: API error');
+        }
+        return res.json(api_res);
+    } catch (error) {
+        console.error("Error:", error);
+        return res.status(500).send('Error: ' + error);
+    }
+});
+
 
 module.exports = router;

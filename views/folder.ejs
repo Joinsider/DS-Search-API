@@ -4,12 +4,13 @@
     <%- include('./partials/head.ejs') %>
     <link type="text/css" rel="stylesheet" href="stylesheets/style.css">
     <link type="text/css" rel="stylesheet" href="stylesheets/shared_folders.css">
+    <link type="text/css" rel="stylesheet" href="stylesheets/folder.css">
 </head>
 <body>
 <div class="container">
     <h1>DS Search:</h1>
-    <h2>Shared Folders</h2>
-
+    <h2>Folder</h2>
+    <button value="back" onclick="window.location.href='/sharedFolders'">Back</button>
     <div class="shared_folders"></div>
     <button name="logout" onclick="logout()">Logout</button>
 </div>
@@ -17,7 +18,7 @@
 <%- include('./partials/loading.ejs') %>
 <script src="javascripts/main.js"></script>
 <script src="javascripts/folder.js"></script>
-<script src="javascripts/shared_folders.js"></script>
-<%- include('./partials/cookies.ejs')%>
+<%- include('./partials/cookies.ejs') %>
+</div>
 </body>
 </html>

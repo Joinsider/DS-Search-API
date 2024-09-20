@@ -10,4 +10,8 @@ router.get('/sharedFolders', (req, res) => {
     res.render('sharedFolders', { title: 'Shared Folders' });
 })
 
+router.get('/folder', (req, res) => {
+    res.render('folder', { title: 'Folder' });
+});
+
 module.exports = router;

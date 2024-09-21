@@ -11,6 +11,11 @@
     <h1>DS Search:</h1>
     <h2>Folder</h2>
     <button value="back" onclick="window.location.href='/sharedFolders'">Back</button>
+    <form id="search">
+        <label for="search_input">Search:</label>
+        <input type="text" id="search_input" name="search_input">
+        <button type="submit">Search</button>
+    </form>
     <div class="shared_folders"></div>
     <button name="logout" onclick="logout()">Logout</button>
 </div>

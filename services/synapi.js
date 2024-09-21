@@ -10,7 +10,9 @@ let fetch;
     fetch = (await import('node-fetch')).default;
 })();
 
-async function loginSynAPI(protocol, url, username, password, otp_code) {
+
+//
+async function login(protocol, url, username, password, otp_code) {
     if (!protocol || !url || !username || !password) {
         return false;
     }
@@ -47,7 +49,7 @@ async function loginSynAPI(protocol, url, username, password, otp_code) {
     }
 }
 
-async function logoutSynAPI(protocol, url, sid) {
+async function logout(protocol, url, sid) {
     if (!sid) {
         return false;
     }
@@ -73,7 +75,9 @@ async function logoutSynAPI(protocol, url, sid) {
     }
 }
 
-async function getSharedFolders(protocol, url, sid) {
+// Folder Functions
+
+async function list_share(protocol, url, sid) {
     if(!sid || !protocol || !url) {
         return false;
     }
@@ -83,16 +87,12 @@ async function getSharedFolders(protocol, url, sid) {
     console.log("API location Shared Folders:", location);
     try {
         const data = await makeRequest(location);
-        console.log("Raw Response Data: " + data);
 
 
         if(data.success === 'false' || data.error) {
             throw new Error("API error");
-            return false;
         }else {
-            const shares = data.data.shares;
-            console.log("Shares:", shares);
-            return shares;
+            return data.data.shares;
         }
     } catch (error) {
         console.log("Error:", error);
@@ -100,7 +100,31 @@ async function getSharedFolders(protocol, url, sid) {
     }
 }
 
+async function list(protocol, url, sid, folderPath) {
+    if(!sid || !protocol || !url || !folderPath) {
+        return false;
+    }
+    const encodedSid = encodeURIComponent(sid);
+    const encodedFolderPath = encodeURIComponent(`"${folderPath}"`);
 
+    const location = `${protocol}${url}/webapi/entry.cgi?api=SYNO.FileStation.List&version=2&folder_path=${encodedFolderPath}&sort_by=name&method=list&_sid=${encodedSid}`;
+    console.log("API location List Folder:", location);
+    try {
+        const data = await makeRequest(location);
+        console.log("Raw Response Data: " + data);
+
+        if(data.success === false || data.error) {
+            throw new Error("API error");
+        }else {
+            const files = data.data.files;
+            console.log("Files:", files);
+            return files;
+        }
+    } catch (error) {
+        console.log("Error:", error);
+        return false;
+    }
+}
 
 async function makeRequest(location) {
     const response = await fetch(location, { agent });
@@ -130,7 +154,8 @@ function err(error) {
 }
 
 module.exports = {
-    loginSynAPI,
-    logoutSynAPI,
-    getSharedFolders
+    login,
+    logout,
+    list_share,
+    list
 }

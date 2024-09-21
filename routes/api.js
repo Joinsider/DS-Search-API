@@ -28,7 +28,7 @@ router.post('/login', async function (req, res) {
     }
 
     try {
-        const api_res = await api.loginSynAPI(protocol, url, username, password, otp_code);
+        const api_res = await api.login(protocol, url, username, password, otp_code);
         console.log("API response:", api_res);
 
         if(api_res === false) {
@@ -79,7 +79,7 @@ router.get('/logout', async function (req, res) {
     }
 
     try {
-        const api_res = await api.logoutSynAPI(protocol, url, sid);
+        const api_res = await api.logout(protocol, url, sid);
         if (!api_res) {
             return res.status(500).send('Logout failed');
         }else {
@@ -93,8 +93,29 @@ router.get('/logout', async function (req, res) {
 
 });
 
+router.get('/checkLogin', async (req, res) => {
+   const sid = req.cookies.synology_sid;
+
+    const protocol = req.cookies.protocol;
+    const url = req.cookies.url;
+    if(!sid || !protocol || !url) {
+        return res.status(400).send('false');
+    }
+
+    try {
+        const api_res = await api.list_share(protocol, url, sid);
+        if(api_res === false) {
+            return res.status(500).send('false');
+        }
+        return res.status(200).send('true');
+    } catch (error) {
+        console.error("Error:", error);
+        return res.status(500).send('false');
+    }
+});
+
 // Folders
-router.get('/sharedFolders', async (req, res) => {
+router.get('/list_share', async (req, res) => {
     const sid = req.cookies.synology_sid;
     const protocol = req.cookies.protocol;
     const url = req.cookies.url;
@@ -105,7 +126,7 @@ router.get('/sharedFolders', async (req, res) => {
     }
 
     try {
-        const api_res = await api.getSharedFolders(protocol, url, sid);
+        const api_res = await api.list_share(protocol, url, sid);
         if (!api_res) {
             return res.status(500).send('Error: No shared folders found');
         } else if (api_res === false) {
@@ -118,18 +139,20 @@ router.get('/sharedFolders', async (req, res) => {
     }
 })
 
-router.get('/listFolder', async (req, res) => {
+router.get('/list', async (req, res) => {
     const sid = req.cookies.synology_sid;
     const protocol = req.cookies.protocol;
     const url = req.cookies.url;
-    const path = req.query.folder;
+    const path = req.cookies.selectedFolder;
 
-    if (!sid) {
-        return res.status(400).send('No SID found');
+    if (!sid ) {
+        return res.status(400).redirect('/');
     }
 
     try {
-        const api_res = await api.listFolder(protocol, url, sid, path);
+        console.log("Cookies:", sid, protocol, url)
+        const api_res = await api.list(protocol, url, sid, path);
+        console.log("API response:", api_res);
         if (!api_res) {
             return res.status(500).send('Error: No files found');
         } else if (api_res === false) {

@@ -166,4 +166,43 @@ router.get('/list', async (req, res) => {
 });
 
 
+
+router.get('/download', async (req, res) => {
+    const sid = req.cookies.synology_sid;
+    const protocol = req.cookies.protocol;
+    const url = req.cookies.url;
+    const path = req.query.path;
+
+    if (!sid) {
+        return res.status(400).redirect('/');
+    }
+
+    console.log("Cookies:", sid, protocol, url);
+    console.log("Download path:", path);
+    try {
+        const api_res = await api.download(protocol, url, sid, path);
+        console.log("API response:", api_res);
+        if (!api_res) {
+            return res.status(500).send('Error: Download failed');
+        } else if (api_res === false) {
+            return res.status(500).send('Error: API error');
+        }
+
+        const contentDisposition = api_res.headers.get('content-disposition');
+        const contentType = api_res.headers.get('content-type');
+
+        if (contentDisposition) {
+            res.setHeader('Content-Disposition', contentDisposition);
+        }
+        if (contentType) {
+            res.setHeader('Content-Type', contentType);
+        }
+
+        api_res.body.pipe(res);
+    } catch (error) {
+        console.error("Error:", error);
+        return res.status(500).send('Error: ' + error);
+    }
+});
+
 module.exports = router;

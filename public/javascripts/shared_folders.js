@@ -49,21 +49,33 @@ async function fetchFolders(apiEndpoint) {
 
 // Select a folder, then update the folders
 async function selectFolder(path, id) {
-    console.log("Selected folder:", path);
-    setCookie('selectedFolder', path, 1);
-    localStorage.setItem('selectedFolderId', id);
+    const selectedFolder = document.getElementById(id);
+    if(selectedFolder.classList.contains('file')) {
+        console.log("Selected folder is a file");
 
-    // Find the folder with the correct path element
-    const folders = document.querySelectorAll('.folder');
-    folders.forEach(folder => {
-        if(folder.querySelector('p').textContent.includes(path)) {
-            folder.setAttribute('selected', 'true');
-        }else {
-            folder.removeAttribute('selected');
-        }
-    });
+        // Download the file
+        const folderPath = selectedFolder.getAttribute('path');
+        console.log("Downloading file:", folderPath);
+        // const encodedPath = encodeURIComponent(`"${folderPath}"`);
+        const encodedPath = `"${folderPath}"`;
+        window.location.href = `/api/download?path=${encodedPath}`;
+        return;
+    }else {
+        console.log("Selected folder:", path);
+        setCookie('selectedFolder', path, 1);
+        localStorage.setItem('selectedFolderId', id);
 
-    await updateFolders();
+        // Find the folder with the correct path element
+        const folders = document.querySelectorAll('.folder');
+        folders.forEach(folder => {
+            if(folder.getAttribute('path') === path) {
+                folder.setAttribute('selected', 'true');
+            }else {
+                folder.removeAttribute('selected');
+            }
+        });
+        await updateFolders();
+    }
 }
 
 // Update the folders on the page
@@ -110,30 +122,16 @@ function implementFolders(folders, isShare) {
         const folderDiv = document.createElement('div');
         if(folder.isdir === true) {
             folderDiv.classList.add('folder');
-            folderDiv.setAttribute('onclick', "selectFolder('" + folder.path + "', " + id + ")");
         }else {
             folderDiv.classList.add('file');
+            folderDiv.classList.add('folder');
         }
         folderDiv.id = id.toString();
+
+
+        folderDiv.setAttribute('onclick', "selectFolder('" + folder.path + "', " + id + ")");
+
         id++;
-        if(folder.isdir === true) {
-            if(isShare === true) {
-                folderDiv.innerHTML = `
-                <img src="images/share-icon.svg" alt="Folder" class="file_icon">
-                <h3 class="name">${folder.name}</h3>
-                <p class="path">${folder.path}</p>`;
-            }else {
-                folderDiv.innerHTML = `
-            <img src="images/folder-icon.svg" alt="Share" class="file_icon">
-            <h3 class="name">${folder.name}</h3>
-            <p class="path">${folder.path}</p>`;
-            }
-        } else {
-            folderDiv.innerHTML = `
-            <img src="images/file-icon.svg" alt="Share" class="file_icon">
-            <h3 class="name">${folder.name}</h3>
-            <p class="path">${folder.path}</p>`;
-        }
 
         const icon = document.createElement('img');
         icon.classList.add('file_icon');
@@ -142,14 +140,10 @@ function implementFolders(folders, isShare) {
 
         const name = document.createElement('h3');
         name.classList.add('name');
-        name.textContent = folder.name.toString;
+        name.textContent = folder.name;
         folderDiv.appendChild(name);
 
-        const pathElement = document.createElement('p');
-        pathElement.classList.add('path');
-        pathElement.textContent = folder.path.toString;
-        folderDiv.appendChild(pathElement);
-
+        folderDiv.setAttribute('path', folder.path);
         sharedFolders.appendChild(folderDiv);
     });
 
@@ -191,7 +185,17 @@ function check_type(element, isShare) {
 // Set header
 function setHeader() {
 
-    const header = document.querySelector('.headerContainer');
+    const header = document.querySelector('.editContainer');
+
+    header.innerHTML = '';
+    header.innerHTML = `
+    <form id="searchForm">
+        <input type="text" id="search" name="search" placeholder="Search in current folder">
+        <button type="submit" onclick="search()">Search</button>
+    </form>
+    <button class="backBtn" onclick="back()">Back</button>
+    `
+    /*
     const backBtn = document.querySelector('.backBtn');
 
     if(backBtn) {
@@ -231,6 +235,7 @@ function setHeader() {
     searchForm.appendChild(searchButton);
 
     header.appendChild(searchForm);
+    */
 }
 
 function back() {

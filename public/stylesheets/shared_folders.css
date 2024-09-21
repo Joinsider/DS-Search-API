@@ -5,7 +5,7 @@ div .shared_folders {
 
 div .shared_folders {
     display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(200px, 300px));
+    grid-template-columns: repeat(auto-fill, minmax(200px, auto));
     gap: 10px;
     width: 90%;
 }
@@ -13,9 +13,7 @@ div .shared_folders {
 .folder {
     display: grid;
     grid-template-columns: 1fr;
-    grid-template-rows: 1fr 0.4fr 0.2fr;
-    grid-column-gap: 0;
-    grid-row-gap: 0;
+    grid-template-rows: 1fr 0.5fr;
     background-color: var(--color-surface-200);
     cursor: pointer;
     font-weight: bold;
@@ -25,17 +23,14 @@ div .shared_folders {
 
 .file_icon {
     grid-area: 1 / 1 / 2 / 2;
-    width: auto;
+    max-width: 100px;
     align-self: center;
+    justify-self: center;
 }
 .name {
     grid-area: 2 / 1 / 3 / 2;
     color: var(--color-primary-500);
-    text-overflow: ellipsis;
-    white-space: nowrap;
-    overflow: hidden;
 }
-.path { grid-area: 3 / 1 / 4 / 2; }
 
 div .folder:hover {
     background-color: var(--color-surface-300);
@@ -47,21 +42,21 @@ div .folder[selected="true"] {
 
 @media (max-width: 768px) {
     div .shared_folders {
-        grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+        grid-template-columns: repeat(auto-fill, minmax(200px, 500px));
     }
 
     .folder {
-        display: grid;
-        grid-template-columns: 0.4fr 1fr;
-        grid-template-rows: 0.8fr 0.4fr;
-        grid-row-gap: 0px;
-        grid-column-gap: 10px;
+        ddisplay: grid;
+        grid-template-columns: 0.3fr 1fr;
+        grid-template-rows: 1fr;
+        grid-column-gap: 0px;
+        grid-row-gap: 10px;
     }
 
     .file_icon {
-        grid-area: 1 / 1 / 3 / 2;
-        width: auto;
+        grid-area: 1 / 1 / 2 / 2;
+        width: 50px;
     }
     .name { grid-area: 1 / 2 / 2 / 3; }
-    .path { grid-area: 2 / 2 / 3 / 3; }
+
 }

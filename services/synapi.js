@@ -153,9 +153,34 @@ function err(error) {
     return false;
 }
 
+const downloadAgent = new https.Agent({
+    rejectUnauthorized: false
+});
+
+
+async function download(protocol, url, sid, path) {
+    const encodedSid = encodeURIComponent(sid);
+    const encodedPath = encodeURIComponent(path);
+    try {
+        const response = await fetch(`${protocol}${url}/webapi/entry.cgi?api=SYNO.FileStation.Download&version=2&method=download&path=${encodedPath}&_sid=${encodedSid}`, {
+            agent: downloadAgent
+        });
+
+        if (!response.ok) {
+            throw new Error(`HTTP error! status: ${response.status}`);
+        }
+        console.log(response);
+        return response;
+    } catch (error) {
+        console.error("Error:", error);
+        return false;
+    }
+}
+
 module.exports = {
     login,
     logout,
     list_share,
-    list
+    list,
+    download
 }

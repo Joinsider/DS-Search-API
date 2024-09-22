@@ -84,7 +84,7 @@ router.get('/logout', async function (req, res) {
             return res.status(500).send('Logout failed');
         }else {
             // Delete the three cookies
-            res.clearCookie('synology_sid');
+            res.clearCookie('synology_sid').send('Logout successful');
         }
     }catch (error) {
         console.error("Error:", error);
@@ -199,6 +199,63 @@ router.get('/download', async (req, res) => {
         }
 
         api_res.body.pipe(res);
+    } catch (error) {
+        console.error("Error:", error);
+        return res.status(500).send('Error: ' + error);
+    }
+});
+
+router.get('/start_search', async (req, res) => {
+    const sid = req.cookies.synology_sid;
+    const protocol = req.cookies.protocol;
+    const url = req.cookies.url;
+    const folder = req.cookies.selectedFolder;
+    const pattern = req.query.pattern;
+
+    if (!sid) {
+        return res.status(400).redirect('/');
+    }
+
+    try {
+        const api_res = await api.start_search(protocol, url, sid, folder, pattern);
+        if (!api_res) {
+            return res.status(500).send('Error: Search failed');
+        } else if (api_res === false) {
+            return res.status(500).send('Error: API error');
+        }
+
+        return res.json(api_res);
+    } catch (error) {
+        console.error("Error:", error);
+        return res.status(500).send('Error: ' + error);
+    }
+});
+
+router.get('/search', async (req, res) => {
+   const sid = req.cookies.synology_sid;
+    const protocol = req.cookies.protocol;
+    const url = req.cookies.url;
+    const searchID = req.query.taskid;
+
+    if (!sid || !protocol || !url) {
+        return res.status(400).redirect('/');
+    } else if (!searchID) {
+        return res.status(400).send('No search ID found');
+    }
+
+    try {
+        const api_res = await api.search(protocol, url, sid, searchID);
+        console.log("API_RES:")
+        console.log(api_res);
+        if (!api_res) {
+            return res.status(500).send('Error: Search failed');
+        } else if (api_res === false) {
+            return res.status(500).send('Error: API error');
+        } else if (api_res === 'searching') {
+            return res.status(202).send('searching');
+        }
+
+        return res.json(api_res);
     } catch (error) {
         console.error("Error:", error);
         return res.status(500).send('Error: ' + error);

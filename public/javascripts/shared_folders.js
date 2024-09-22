@@ -3,6 +3,20 @@ document.addEventListener('DOMContentLoaded', async function () {
     const loading = document.querySelector('.loadingContainer');
     loading.setAttribute('active', 'true');
 
+    const pathParameter = window.location.search;
+    console.log("Path parameter:", pathParameter);
+    if(pathParameter !== '') {
+        const path = new URLSearchParams(pathParameter).get('path');
+
+        const decodedPath = decodeURIComponent(path);
+        console.log("Decoded path:", decodedPath);
+        if(decodedPath !== null || decodedPath !== '') {
+            setCookie('selectedFolder', decodedPath, 1);
+        }
+    } else {
+        document.cookie = 'selectedFolder=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;';
+    }
+
     await updateFolders();
 
     loading.setAttribute('active', 'false');
@@ -74,7 +88,8 @@ async function selectFolder(path, id) {
                 folder.removeAttribute('selected');
             }
         });
-        await updateFolders();
+        const urlpath = encodeURIComponent(path);
+        window.location.href = '/folder?path=' + urlpath;
     }
 }
 
@@ -109,6 +124,9 @@ function check_path() {
     const path = getCookie('selectedFolder');
     if(!path) {
         console.log("No path found");
+        return false;
+    } else if (path === '' || path === null) {
+        console.log("Empty path found");
         return false;
     }
     return path;
@@ -236,17 +254,118 @@ function setHeader() {
 
     header.appendChild(searchForm);
     */
+
+    const searchForm = document.getElementById('searchForm');
+    searchForm.addEventListener('submit', (event) => {
+        event.preventDefault();
+        search();
+    });
 }
 
 function back() {
-    const path = getCookie('selectedFolder');
-
-    if(path) {
-        const splitPath = path.split('/');
-        splitPath.pop();
-        const newPath = splitPath.join('/');
-        setCookie('selectedFolder', newPath, 1);
+    console.log("Going back");
+    // Get Path from url parameter
+    const pathParameter = window.location.search;
+    let path = decodeURIComponent(new URLSearchParams(pathParameter).get('path'));
+    console.log("Path from URL:", path);
+    if(path === null || path === '') {
+        path = getCookie('selectedFolder');
+        if(path === null || path === '') {
+            return window.location.href= '/sharedFolders'
+        }
     }
 
+    // Split the path
+    const splitPath = path.split('/');
+    splitPath.pop();
+    const newPath = splitPath.join('/');
+
+    // if the path is empty, go to the shared folders
+    if(newPath === '') {
+        window.location.href = '/sharedFolders';
+    }
+
+    // Set the new path
+    setCookie('selectedFolder', newPath, 1);
+    window.location.href = '/folder?path=' + newPath;
+
+
     updateFolders();
+}
+
+
+// Search for a file in the current folder
+async function search() {
+
+    const searchInput = document.getElementById('search');
+    const pattern = searchInput.value;
+    const path = getCookie('selectedFolder');
+    if(pattern === '' || pattern === null || !path) {
+        console.log("No search pattern or path found");
+        return;
+    }
+
+    // Empty folders and deactivate form
+    const sharedFolders = document.querySelector('.shared_folders');
+    sharedFolders.innerHTML = '';
+
+    const loading = document.querySelector('.loadingContainer');
+    loading.setAttribute('active', 'true');
+
+    const searchForm = document.getElementById('searchForm');
+    searchForm.setAttribute('active', 'false');
+
+
+    // Make POST request to start search
+    try {
+        const response = await fetch('/api/start_search?pattern=' + pattern, {
+            method: 'GET'
+        });
+
+        if(!response.ok) {
+            throw new Error(`HTTP error! status: ${response.status}`);
+        }
+
+        const data = await response.json();
+        console.log("Search response:", data);
+        const taskId = data.data.taskid;
+
+        console.log("Api response:", response);
+
+        if(!response.ok) {
+            throw new Error(`HTTP error! status: ${response.status}`);
+        }
+
+        console.log("Task ID:", taskId);
+
+        await checkSearch(taskId);
+
+    } catch (error) {
+        console.error("Error:", error);
+    }
+
+}
+
+// Check the search
+async function checkSearch(taskid) {
+    try {
+        const response = await fetch(`/api/search?taskid=${taskid}`, {
+            method: 'GET'
+        });
+
+        if(!response.ok) {
+            throw new Error(`HTTP error! status: ${response.status}`);
+        }
+
+        const data = await response.json();
+        console.log("Files:", files);
+
+        if(files.length === 0) {
+            noFolders();
+        }else {
+            implementFolders(files);
+        }
+    } catch (error) {
+        console.error("Error:", error);
+    }
 }

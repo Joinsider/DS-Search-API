@@ -126,6 +126,59 @@ async function list(protocol, url, sid, folderPath) {
     }
 }
 
+async function download(protocol, url, sid, path) {
+    const encodedSid = encodeURIComponent(sid);
+    const encodedPath = encodeURIComponent(path);
+    try {
+        const response = await fetch(`${protocol}${url}/webapi/entry.cgi?api=SYNO.FileStation.Download&version=2&method=download&path=${encodedPath}&_sid=${encodedSid}`, {
+            agent: downloadAgent
+        });
+
+        if (!response.ok) {
+            throw new Error(`HTTP error! status: ${response.status}`);
+        }
+        console.log(response);
+        return response;
+    } catch (error) {
+        console.error("Error:", error);
+        return false;
+    }
+}
+
+async function start_search(protocol, url, sid, folderPath, pattern) {
+    const encodedSid = encodeURIComponent(sid);
+    const encodedFolderPath = encodeURIComponent(`"${folderPath}"`);
+    const encodedPattern = encodeURIComponent(`"${pattern}"`);
+    const location = `${protocol}${url}/webapi/entry.cgi?api=SYNO.FileStation.Search&version=2&method=start&pattern=${encodedPattern}&folder_path=${encodedFolderPath}&_sid=${encodedSid}`;
+    console.log("API location Start Search:", location);
+
+    const res = await makeRequest(location);
+
+    if(res.success === false || res.error) {
+        return false;
+    }
+    console.log("Search ID:", res.data.taskid);
+    return res;
+}
+
+async function search(protocol, url, sid, searchID) {
+    const encodedSid = encodeURIComponent(sid);
+    const location = `${protocol}${url}/webapi/entry.cgi?api=SYNO.FileStation.Search&version=2&method=list&taskid=${searchID}&_sid=${encodedSid}`;
+    console.log("API location Search:", location);
+
+    const res = await makeRequest(location);
+    console.log("Search Response:", res);
+
+    if(res.success === false || res.error) {
+        return false;
+    }
+
+    return res;
+}
+
+async function delete_search(protocol, url, sid, searchID) {
+}
+
 async function makeRequest(location) {
     const response = await fetch(location, { agent });
 
@@ -158,29 +211,13 @@ const downloadAgent = new https.Agent({
 });
 
 
-async function download(protocol, url, sid, path) {
-    const encodedSid = encodeURIComponent(sid);
-    const encodedPath = encodeURIComponent(path);
-    try {
-        const response = await fetch(`${protocol}${url}/webapi/entry.cgi?api=SYNO.FileStation.Download&version=2&method=download&path=${encodedPath}&_sid=${encodedSid}`, {
-            agent: downloadAgent
-        });
-
-        if (!response.ok) {
-            throw new Error(`HTTP error! status: ${response.status}`);
-        }
-        console.log(response);
-        return response;
-    } catch (error) {
-        console.error("Error:", error);
-        return false;
-    }
-}
-
 module.exports = {
     login,
     logout,
     list_share,
     list,
-    download
+    download,
+    start_search,
+    search,
+    delete_search
 }

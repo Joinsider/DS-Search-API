@@ -357,13 +357,21 @@ async function checkSearch(taskid) {
             throw new Error(`HTTP error! status: ${response.status}`);
         }
 
-        const data = await response.json();
-        console.log("Files:", files);
+        const res = await response.json();
+        console.log("Search response:", res);
+        if(res.data.finished === false) {
+            setTimeout(() => {
+                checkSearch(taskid);
+            }, 1000);
+        } else if( res.data.files !== undefined) {
+            implementFolders(res.data.files, false);
 
-        if(files.length === 0) {
+            // Deactivate Loading and activate form
+            const loading = document.querySelector('.loadingContainer');
+            loading.setAttribute('active', 'false');
+
+        } else {
             noFolders();
-        }else {
-            implementFolders(files);
         }
     } catch (error) {
         console.error("Error:", error);

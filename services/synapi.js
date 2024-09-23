@@ -147,8 +147,10 @@ async function download(protocol, url, sid, path) {
 
 async function start_search(protocol, url, sid, folderPath, pattern) {
     const encodedSid = encodeURIComponent(sid);
-    const encodedFolderPath = encodeURIComponent(`"${folderPath}"`);
+    const encodedFolderPath = encodeURIComponent(`["${folderPath}"]`);
     const encodedPattern = encodeURIComponent(`"${pattern}"`);
+    console.log("Encoded Pattern:", encodedPattern);
+    console.log("Encoded Folder Path:", encodedFolderPath);
     const location = `${protocol}${url}/webapi/entry.cgi?api=SYNO.FileStation.Search&version=2&method=start&pattern=${encodedPattern}&folder_path=${encodedFolderPath}&_sid=${encodedSid}`;
     console.log("API location Start Search:", location);
 
@@ -162,8 +164,9 @@ async function start_search(protocol, url, sid, folderPath, pattern) {
 }
 
 async function search(protocol, url, sid, searchID) {
+    const encodedSearchID = encodeURIComponent(`"${searchID}"`);
     const encodedSid = encodeURIComponent(sid);
-    const location = `${protocol}${url}/webapi/entry.cgi?api=SYNO.FileStation.Search&version=2&method=list&taskid=${searchID}&_sid=${encodedSid}`;
+    const location = `${protocol}${url}/webapi/entry.cgi?api=SYNO.FileStation.Search&version=2&method=list&taskid=${encodedSearchID}&_sid=${encodedSid}&limit=-1`;
     console.log("API location Search:", location);
 
     const res = await makeRequest(location);

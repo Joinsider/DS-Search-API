@@ -193,9 +193,18 @@ router.get('/download', async (req, res) => {
 
         if (contentDisposition) {
             res.setHeader('Content-Disposition', contentDisposition);
+            console.log("Content-Disposition:", contentDisposition);
         }
         if (contentType) {
             res.setHeader('Content-Type', contentType);
+            console.log("Content-Type:", contentType);
+        }
+        // Set file name from path if no content-disposition header is present
+        if (!contentDisposition) {
+            // Filename but without the " at the end
+            const fileName = path.split('/').pop().replace(/"/g, '');
+            res.setHeader('Content-Disposition', `inline; filename=${fileName}`);
+            console.log("Content-Disposition:", res.getHeader('Content-Disposition'));
         }
 
         api_res.body.pipe(res);
@@ -235,7 +244,7 @@ router.get('/search', async (req, res) => {
    const sid = req.cookies.synology_sid;
     const protocol = req.cookies.protocol;
     const url = req.cookies.url;
-    const searchID = req.query.taskid;
+    const searchID = decodeURIComponent(req.query.taskid);
 
     if (!sid || !protocol || !url) {
         return res.status(400).redirect('/');
@@ -247,6 +256,8 @@ router.get('/search', async (req, res) => {
         const api_res = await api.search(protocol, url, sid, searchID);
         console.log("API_RES:")
         console.log(api_res);
+        console.log("Files:");
+        console.log(api_res.data);
         if (!api_res) {
             return res.status(500).send('Error: Search failed');
         } else if (api_res === false) {

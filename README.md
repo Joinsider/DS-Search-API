@@ -12,7 +12,18 @@ npm install
 
 ### Usage:
 ```bash
-nodemon bin/www
+npm start
+```
+## DOCKER:
+### Build:
+```bash
+docker build -t ds-search-api .
+```
+### Run:
+```bash
+docker run -p 3000:3000 ds-search-api
 ```
 
-## API functions:
+## More Information:
+- [Backend Documentation](documentation/backend.md)
+- [Frontend Documentation](documentation/frontend.md)

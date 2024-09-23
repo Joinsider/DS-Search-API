@@ -7,7 +7,25 @@ router.get('/', function(req, res, next) {
 });
 
 router.get('/sharedFolders', (req, res) => {
+    const path = req.query.path;
+
+    if(path) {
+        // Set the cookie
+        res.cookie('selectedFolder', path).render('sharedFolders', { title: 'Shared Folders' });
+    }
+
     res.render('sharedFolders', { title: 'Shared Folders' });
 })
+
+router.get('/folder', (req, res) => {
+    const path = req.query.path;
+
+    if(path) {
+        // Set the cookie
+        res.cookie('selectedFolder', path).render('sharedFolders', { title: 'Shared Folders' });
+    }
+
+    res.render('sharedFolders', { title: 'Shared Folders' });
+});
 
 module.exports = router;

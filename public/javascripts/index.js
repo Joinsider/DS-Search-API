@@ -1,3 +1,18 @@
+window.addEventListener('DOMContentLoaded', async () => {
+   try {
+       const response = await fetch('/api/checkLogin', {
+              method: 'GET'
+       });
+       if(!response.ok) {
+           throw new Error(`HTTP error! status: ${response.status}`);
+       }
+       if(response.status === 200) {
+           window.location.href = '/sharedFolders';
+       }
+   } catch(error) {
+   }
+});
+
 const connectionForm = document.querySelector('.connection-form');
 
 connectionForm.addEventListener('submit', async (event) => {

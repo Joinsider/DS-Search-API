@@ -91,7 +91,7 @@ input[type="submit"] {
 
 
 /* Cookie Banner */
-#cookie-banner button {
+button {
     background-color: var(--color-primary-200);
     border: none;
     color: white;

@@ -4,6 +4,7 @@ Relay and cache API requests to Synology NAS
 
 ## Functionality:
 - Cache Requests from Synology NAS and relay to frontend application
+- Uses Synology's built-in search method for file location
 
 ### Installation:
 ```bash

@@ -30,6 +30,6 @@ jobs:
           ssh -i ~/.ssh/deploy_key ${{ secrets.SSH_USER }}@${{ secrets.SERVER_IP }} << 'EOF'
             cd /path/to/your/express-app
             git pull origin master
-            npm ci --production
+            npm install --production
             pm2 restart express-app
           EOF
